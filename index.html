@@ -158,8 +158,7 @@ addEventListener('scroll',rq,{passive:true});addEventListener('pointermove',e=>{
 
 let cur=0,last=-1,dw=true,B=[];const cv=$('cv'),cx=cv.getContext('2d');
 function sz(){const d=Math.min(devicePixelRatio||1,2);cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d);dw=true}sz();addEventListener('resize',sz);
-function draw(f){const n=B.length;if(!n)return;const i=Math.min(n-1,Math.floor(f)),j=Math.min(n-1,i+1),a=f-i,W=cv.width,H=cv.height,s=Math.min(W/B[i].width,H/B[i].height),w=B[i].width*s,h=B[i].height*s,x=(W-w)/2,y=(H-h)/2;
-cx.globalAlpha=1;cx.fillStyle='#000';cx.fillRect(0,0,W,H);cx.drawImage(B[i],x,y,w,h);if(a>.03&&j!=i){cx.globalAlpha=a;cx.drawImage(B[j],x,y,w,h);cx.globalAlpha=1}}
+function draw(f){const n=B.length;if(!n)return;let i=Math.min(n-1,Math.floor(f)),j=Math.min(n-1,i+1);let bi=B[i];if(!bi){for(let k=i-1;k>=0;k--)if(B[k]){bi=B[k];break}if(!bi)for(let k=i+1;k<n;k++)if(B[k]){bi=B[k];break}}if(!bi)return;let bj=B[j]||bi;const a=f-i,W=cv.width,H=cv.height,s=Math.min(W/bi.width,H/bi.height),w=bi.width*s,h=bi.height*s,x=(W-w)/2,y=(H-h)/2;cx.globalAlpha=1;cx.fillStyle='#000';cx.fillRect(0,0,W,H);cx.drawImage(bi,x,y,w,h);if(a>.03&&bj!=bi){cx.globalAlpha=a;cx.drawImage(bj,x,y,w,h);cx.globalAlpha=1}}
 (function c(){const r=vid.getBoundingClientRect(),p=Math.min(1,Math.max(0,-r.top/(r.height-innerHeight)));cur+=(p-cur)*.16;
 if(B.length&&(dw||Math.abs(cur-last)>1e-4)){draw(cur*(B.length-1));last=cur;dw=false}
 const q=p*3,k=Math.min(2,Math.floor(q)),f=q-k;sc.forEach((e,i)=>e.classList.toggle('on',i==k));dt.forEach((u,i)=>u.style.width=(i<k?100:i==k?f*100:0)+'%');requestAnimationFrame(c)})();
@@ -171,10 +170,12 @@ const x=Math.max(0,Math.round(a*(c-b)/100));$('rs').textContent=x;$('ry').textCo
 for(let i=-6;i<=6;i++){const s=document.createElement('i');s.className='sl';s.style.transform='translateZ('+i+'px)';pl.insertBefore(s,pl.querySelector('.back'))}
 const ST=[...document.querySelectorAll('#ld svg')],t0=performance.now(),FR=JSON.parse($('fr').textContent),tw=Math.min(1280,Math.round(innerWidth*Math.min(devicePixelRatio||1,2)));let shown=0,done=0,fr=false,ready=false;
 document.fonts&&document.fonts.ready.then(()=>fr=true);
-Promise.all(FR.map((s,i)=>{const im=new Image();im.src=s;return im.decode().then(()=>createImageBitmap(im,{resizeWidth:tw,resizeQuality:'high'}).catch(()=>im)).then(x=>{B[i]=x;done++}).catch(()=>{B[i]=im;done++})})).then(()=>{B=B.filter(Boolean);ready=true;dw=true});
-(function L(){const to=performance.now()-t0>15000,real=ready||to?1:done/FR.length*.85+(fr?.15:0),el=(performance.now()-t0)/2200;shown+=(Math.min(real,el,1)-shown)*.12;const pc=Math.round(shown*100);
+const PRIO=Math.min(8,FR.length);
+function lf(i){return new Promise(res=>{const im=new Image();im.src=FR[i];im.decode().then(()=>createImageBitmap(im,{resizeWidth:tw,resizeQuality:'medium'}).catch(()=>im)).then(x=>{B[i]=x;done++;res()}).catch(()=>{B[i]=im;done++;res()})})}
+Promise.all(Array.from({length:PRIO},(_,i)=>lf(i))).then(()=>{ready=true;dw=true;let next=PRIO;function bg(){if(next>=FR.length)return;const ck=[];for(let c=0;c<4&&next<FR.length;c++,next++)ck.push(lf(next));Promise.all(ck).then(()=>{if(window.requestIdleCallback)requestIdleCallback(bg,{timeout:80});else setTimeout(bg,12)})};bg()});
+(function L(){const to=performance.now()-t0>3500,real=ready||to?1:Math.min(1,done/PRIO*.85+(fr?.15:0)),el=(performance.now()-t0)/450;shown+=(Math.min(real,el,1)-shown)*.28;const pc=Math.min(100,Math.round(shown*100));
 $('lc').textContent=pc;ST.forEach((s,i)=>s.classList.toggle('on',pc>=(i+1)*19));
-if(real>=1&&el>=1&&shown>.985){$('lc').textContent=100;ST.forEach(s=>s.classList.add('on'));setTimeout(()=>$('ld').classList.add('x'),400);return}requestAnimationFrame(L)})();
+if(real>=1&&el>=1&&shown>.96){$('lc').textContent=100;ST.forEach(s=>s.classList.add('on'));setTimeout(()=>$('ld').classList.add('x'),180);return}requestAnimationFrame(L)})();
 const CK={40:"https://checkout.nubank.com.br/Y5u2EwFqLGdb8hoq",100:"https://checkout.nubank.com.br/Cok2Bbymngdb8hoq"};
 document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=b.dataset.p;$('mt').textContent=p==40?'Placa Toca · R$ 40':'Placa + cadastro no Google · R$ 100';$('mp').href=CK[p];$('mw').href="https://wa.me/"+PHONE+"?text="+encodeURIComponent("Olá! Tenho interesse no pacote de R$ "+p+" da Toca.");$('md').classList.add('on')});
 $('md').onclick=e=>{if(e.target.id=='md'||e.target.dataset.x)$('md').classList.remove('on')};
