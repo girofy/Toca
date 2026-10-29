@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/painel", "destination": "/painel/index.html" },
+    { "source": "/painel/(.*)", "destination": "/painel/index.html" },
+    { "source": "/robots.txt", "destination": "/api/robots.txt" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
+    { "source": "/llms.txt", "destination": "/api/llms.txt" }
+  ]
+}
