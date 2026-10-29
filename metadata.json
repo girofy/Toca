@@ -1,0 +1,6 @@
+{
+  "name": "Toca: Placa de Avaliação no Google",
+  "description": "Placa NFC + QR Code para seu cliente avaliar sua empresa no Google em segundos. Entrega grátis em Juazeiro e Petrolina. A partir de R$ 40.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
